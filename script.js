@@ -31,7 +31,6 @@ const firebaseConfig = {
 // ==========================================
 
 const app = initializeApp(firebaseConfig);
-
 const database = getDatabase(app);
 
 
@@ -54,30 +53,34 @@ set(testRef, {
 
 
 // ==========================================
-// YADAV JI DUDH WALE - MUSIC PLAYER
+// MUSIC PLAYER
 // ==========================================
+
+// IMPORTANT:
+// Your MP3 files are in the ROOT of GitHub repository.
+// Therefore DO NOT use "songs/song1.mp3".
 
 const songs = [
     {
-        file: "songs/song1.mp3",
+        file: "song1.mp3",
         title: "Dudh Ke Vyapari",
         artist: "Tuntun Yadav, Shivani Singh",
         emoji: "🥛"
     },
     {
-        file: "songs/song2.mp3",
+        file: "song2.mp3",
         title: "Yadav Ji Ke Dudh",
         artist: "Sharwan Yadav, Prabha Raj",
         emoji: "🐄"
     },
     {
-        file: "songs/song3.mp3",
+        file: "song3.mp3",
         title: "Yadav Ji Ko Saiya Bana Lijiye",
         artist: "Puja Mahi, Rahul Raj",
         emoji: "❤️"
     },
     {
-        file: "songs/song4.mp3",
+        file: "song4.mp3",
         title: "दुधवा में पानी जादव जी",
         artist: "Angad Ram Ojha, Kavita Yadav",
         emoji: "🔥"
@@ -86,7 +89,7 @@ const songs = [
 
 
 // ==========================================
-// ELEMENTS
+// GET HTML ELEMENTS
 // ==========================================
 
 const audio = document.getElementById("audioPlayer");
@@ -98,20 +101,25 @@ const songTitle = document.getElementById("songTitle");
 const songArtist = document.getElementById("songArtist");
 const album = document.querySelector(".album");
 
-let currentSong = -1;
+
+// ==========================================
+// VARIABLES
+// ==========================================
+
+let currentSong = 0;
 let playing = false;
 
 
 // ==========================================
-// CHECK REQUIRED MUSIC ELEMENTS
+// CHECK AUDIO ELEMENT
 // ==========================================
 
 if (!audio) {
-    console.error("Audio element #audioPlayer not found.");
+    console.error("ERROR: #audioPlayer was not found in index.html");
 }
 
 if (!playButton) {
-    console.error("Play button #playButton not found.");
+    console.error("ERROR: #playButton was not found in index.html");
 }
 
 
@@ -119,148 +127,111 @@ if (!playButton) {
 // LOAD SONG
 // ==========================================
 
-function loadSong(index, autoPlay = false) {
+function loadSong(index) {
 
-    if (!audio || !songs[index]) return;
+    if (!audio) return;
+
+    if (index < 0 || index >= songs.length) {
+        index = 0;
+    }
 
     currentSong = index;
 
-    audio.src = songs[currentSong].file;
+    const song = songs[currentSong];
 
+    // Set MP3 file
+    audio.src = song.file;
+
+    // Update title
     if (songTitle) {
-        songTitle.textContent = songs[currentSong].title;
+        songTitle.textContent = song.title;
     }
 
+    // Update artist
     if (songArtist) {
-        songArtist.textContent = songs[currentSong].artist;
+        songArtist.textContent = song.artist;
     }
 
+    // Update album emoji
     if (album) {
-        album.textContent = songs[currentSong].emoji;
+        album.textContent = song.emoji;
     }
 
-    if (autoPlay) {
+    // Prepare audio
+    audio.load();
 
-        audio.play()
-            .then(() => {
+    console.log("Loaded:", song.file);
+}
 
-                playing = true;
 
-                if (playButton) {
-                    playButton.textContent = "⏸";
-                }
+// ==========================================
+// PLAY SONG
+// ==========================================
 
-            })
-            .catch((error) => {
+function playSong() {
 
-                playing = false;
+    if (!audio) return;
 
-                if (playButton) {
-                    playButton.textContent = "▶";
-                }
+    audio.play()
+        .then(() => {
 
-                console.error("Audio play error:", error);
+            playing = true;
 
-            });
+            if (playButton) {
+                playButton.textContent = "⏸";
+            }
+
+            console.log("Playing:", songs[currentSong].file);
+
+        })
+        .catch((error) => {
+
+            playing = false;
+
+            if (playButton) {
+                playButton.textContent = "▶";
+            }
+
+            console.error("Could not play audio:", error);
+
+        });
+}
+
+
+// ==========================================
+// PAUSE SONG
+// ==========================================
+
+function pauseSong() {
+
+    if (!audio) return;
+
+    audio.pause();
+
+    playing = false;
+
+    if (playButton) {
+        playButton.textContent = "▶";
     }
 }
 
 
 // ==========================================
-// RANDOM SONG
-// ==========================================
-
-function randomSong() {
-
-    let next;
-
-    do {
-
-        next = Math.floor(Math.random() * songs.length);
-
-    } while (
-        songs.length > 1 &&
-        next === currentSong
-    );
-
-    loadSong(next, true);
-}
-
-
-// ==========================================
-// NEXT SONG
-// ==========================================
-
-function nextSong() {
-
-    if (songs.length === 0) return;
-
-    let next = (currentSong + 1) % songs.length;
-
-    loadSong(next, true);
-}
-
-
-// ==========================================
-// PREVIOUS SONG
-// ==========================================
-
-function previousSong() {
-
-    if (songs.length === 0) return;
-
-    if (currentSong <= 0) {
-
-        currentSong = songs.length - 1;
-
-    } else {
-
-        currentSong--;
-
-    }
-
-    loadSong(currentSong, true);
-}
-
-
-// ==========================================
-// PLAY / PAUSE
+// PLAY / PAUSE BUTTON
 // ==========================================
 
 if (playButton && audio) {
 
     playButton.addEventListener("click", () => {
 
-        if (!playing) {
+        if (playing) {
 
-            // No song selected yet
-            if (currentSong === -1) {
-
-                randomSong();
-
-            } else {
-
-                audio.play()
-                    .then(() => {
-
-                        playing = true;
-                        playButton.textContent = "⏸";
-
-                    })
-                    .catch((error) => {
-
-                        console.error("Audio play error:", error);
-
-                    });
-            }
+            pauseSong();
 
         } else {
 
-            audio.pause();
+            playSong();
 
-            playing = false;
-
-            playButton.textContent = "▶";
         }
 
     });
@@ -269,14 +240,21 @@ if (playButton && audio) {
 
 
 // ==========================================
-// NEXT BUTTON
+// NEXT SONG
 // ==========================================
 
 if (nextButton) {
 
     nextButton.addEventListener("click", () => {
 
-        nextSong();
+        currentSong++;
+
+        if (currentSong >= songs.length) {
+            currentSong = 0;
+        }
+
+        loadSong(currentSong);
+        playSong();
 
     });
 
@@ -284,14 +262,21 @@ if (nextButton) {
 
 
 // ==========================================
-// PREVIOUS BUTTON
+// PREVIOUS SONG
 // ==========================================
 
 if (prevButton) {
 
     prevButton.addEventListener("click", () => {
 
-        previousSong();
+        currentSong--;
+
+        if (currentSong < 0) {
+            currentSong = songs.length - 1;
+        }
+
+        loadSong(currentSong);
+        playSong();
 
     });
 
@@ -299,14 +284,21 @@ if (prevButton) {
 
 
 // ==========================================
-// AUTO NEXT SONG
+// AUTOMATICALLY PLAY NEXT SONG
 // ==========================================
 
 if (audio) {
 
     audio.addEventListener("ended", () => {
 
-        nextSong();
+        currentSong++;
+
+        if (currentSong >= songs.length) {
+            currentSong = 0;
+        }
+
+        loadSong(currentSong);
+        playSong();
 
     });
 
@@ -314,7 +306,44 @@ if (audio) {
 
 
 // ==========================================
-// RESET PLAY BUTTON WHEN PAUSED
+// AUDIO ERROR CHECK
+// ==========================================
+
+if (audio) {
+
+    audio.addEventListener("error", () => {
+
+        console.error(
+            "ERROR: MP3 could not be loaded:",
+            songs[currentSong].file
+        );
+
+    });
+
+}
+
+
+// ==========================================
+// WHEN AUDIO STARTS
+// ==========================================
+
+if (audio) {
+
+    audio.addEventListener("play", () => {
+
+        playing = true;
+
+        if (playButton) {
+            playButton.textContent = "⏸";
+        }
+
+    });
+
+}
+
+
+// ==========================================
+// WHEN AUDIO PAUSES
 // ==========================================
 
 if (audio) {
@@ -371,15 +400,23 @@ function updateClock() {
 
     const now = new Date();
 
-    clock.textContent =
-        now.toLocaleTimeString("en-IN", {
-            hour: "numeric",
-            minute: "2-digit",
-            hour12: true
-        });
+    clock.textContent = now.toLocaleTimeString("en-IN", {
+        hour: "numeric",
+        minute: "2-digit",
+        hour12: true
+    });
 
 }
 
 updateClock();
 
 setInterval(updateClock, 1000);
+
+
+// ==========================================
+// LOAD FIRST SONG
+// ==========================================
+
+loadSong(0);
+
+console.log("Yadav Ji Dudh Wale music player loaded successfully!");
