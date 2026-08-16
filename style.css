@@ -189,11 +189,23 @@ body {
 
 
 .cow {
-
     font-size: 85px;
-
     margin: 15px;
 
+    background: transparent;
+    border: none;
+
+    cursor: pointer;
+
+    transition: transform 0.2s ease;
+}
+
+.cow:hover {
+    transform: scale(1.12);
+}
+
+.cow:active {
+    transform: scale(0.95);
 }
 
 
