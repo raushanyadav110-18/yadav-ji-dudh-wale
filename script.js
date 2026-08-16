@@ -420,3 +420,24 @@ setInterval(updateClock, 1000);
 loadSong(0);
 
 console.log("Yadav Ji Dudh Wale music player loaded successfully!");
+// ==========================================
+// COW SOUND BUTTON
+// ==========================================
+
+const cowSoundButton = document.getElementById("cowSoundButton");
+const cowSound = document.getElementById("cowSound");
+
+if (cowSoundButton && cowSound) {
+
+    cowSoundButton.addEventListener("click", () => {
+
+        cowSound.currentTime = 0;
+
+        cowSound.play()
+            .catch(error => {
+                console.error("Cow sound error:", error);
+            });
+
+    });
+
+}
