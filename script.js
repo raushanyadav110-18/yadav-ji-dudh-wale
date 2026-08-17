@@ -452,13 +452,4 @@ if (cowSoundButton && cowSound) {
 
 }
 
-const milkButton = document.getElementById("milkButton");
-const milkSection = document.getElementById("milkSection");
 
-milkButton.addEventListener("click", () => {
-    milkSection.style.display = "block";
-
-    milkSection.scrollIntoView({
-        behavior: "smooth"
-    });
-});
