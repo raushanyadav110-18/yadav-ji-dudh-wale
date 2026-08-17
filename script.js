@@ -365,22 +365,32 @@ if (audio) {
 }
 
 
-// ==========================================
+// ==================================================
 // MILK BUTTON
-// ==========================================
+// ==================================================
 
 const milkButton = document.getElementById("milkButton");
 const message = document.getElementById("message");
+const milkSection = document.getElementById("milkSection");
 
 if (milkButton) {
 
     milkButton.addEventListener("click", () => {
 
+        // Show message
         if (message) {
-
             message.textContent =
                 "🥛 Doodh ready hai! Yadav Ji ko bulao 😎";
+        }
 
+        // Show buffalo section
+        if (milkSection) {
+            milkSection.style.display = "block";
+
+            // Smoothly move to buffalo section
+            milkSection.scrollIntoView({
+                behavior: "smooth"
+            });
         }
 
     });
